@@ -24,28 +24,32 @@ function usePlayer() {
 export default function App() {
   usePlayer()
   return (
-    <div className="mx-auto max-w-[1500px] space-y-4 p-4 sm:p-6">
-      <Header />
-      <PhaseStepper />
-      <div className="grid gap-4 lg:grid-cols-12">
-        <div className="space-y-4 lg:col-span-3">
-          <AlgorithmControls />
-          <ConfigurationPanel />
+    <>
+      <div className="mx-auto max-w-[1400px] space-y-12 px-4 pb-16 pt-8 sm:px-8 lg:space-y-16 lg:px-12 lg:pt-12">
+        <Header />
+        <PhaseStepper />
+        <div className="grid gap-6 lg:grid-cols-12">
+          <div className="space-y-6 lg:col-span-3">
+            <AlgorithmControls />
+            <ConfigurationPanel />
+          </div>
+          <div className="space-y-6 lg:col-span-5">
+            <BuildingGrid />
+            <StepLog />
+          </div>
+          <div className="space-y-6 lg:col-span-4">
+            <ConflictGraph />
+            <ColoringPanel />
+          </div>
         </div>
-        <div className="space-y-4 lg:col-span-5">
-          <BuildingGrid />
-          <StepLog />
-        </div>
-        <div className="space-y-4 lg:col-span-4">
-          <ConflictGraph />
-          <ColoringPanel />
-        </div>
+        <AlgorithmStats />
+        <ResultsPanel />
       </div>
-      <AlgorithmStats />
-      <ResultsPanel />
-      <footer className="pb-4 text-center text-[11px] text-slate-500">
-        Educational DAA simulation — a simplified grid/distance model, not RF engineering or a production CCTV planner.
+      <footer className="rounded-t-[56px] border-t-[1.5px] border-ink bg-marker px-6 py-12 text-center">
+        <p className="display mx-auto max-w-2xl text-2xl text-ink">
+          educational daa simulation — a simplified grid and distance model, not rf engineering or a production cctv planner.
+        </p>
       </footer>
-    </div>
+    </>
   )
 }

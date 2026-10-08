@@ -12,13 +12,13 @@ function CameraNode({ data }: NodeProps<Node<CamData>>) {
   return (
     <motion.div
       initial={{ scale: 0 }}
-      animate={{ scale: data.active ? 1.2 : 1, backgroundColor: data.channel ? color : '#1e293b' }}
+      animate={{ scale: data.active ? 1.15 : 1, backgroundColor: data.channel ? color : '#fdfbf9' }}
       transition={{ type: 'spring', stiffness: 300, damping: 16 }}
-      className="grid h-12 w-12 place-items-center rounded-full text-sm font-bold"
+      className="grid h-12 w-12 place-items-center rounded-full text-sm font-semibold"
       style={{
-        color: data.channel ? '#020617' : '#e2e8f0',
-        border: `2px solid ${data.clash ? '#fb7185' : data.channel ? color : '#64748b'}`,
-        boxShadow: data.active ? `0 0 26px ${data.clash ? '#fb7185' : '#22d3ee'}` : data.channel ? `0 0 14px ${color}77` : 'none',
+        color: '#171717',
+        border: `${data.clash || data.active ? 3 : 1.5}px solid ${data.clash ? '#ff6f1e' : '#171717'}`,
+        boxShadow: data.active ? '0 0 0 4px #fdfbf9, 0 0 0 5.5px #171717' : 'none',
       }}
     >
       <Handle type="target" position={Position.Top} className="!opacity-0" />
@@ -69,26 +69,27 @@ export function ConflictGraph() {
           target: `c${e.b}`,
           animated: true,
           label: e.distance.toFixed(1),
-          labelStyle: { fill: '#94a3b8', fontSize: 9 },
-          labelBgStyle: { fill: '#0f172a' },
-          style: { stroke: clash ? '#fb7185' : '#64748b', strokeWidth: clash ? 3 : 1.6 },
+          labelStyle: { fill: '#171717', fontSize: 11, fontWeight: 500 },
+          labelBgStyle: { fill: '#ffffff', stroke: '#171717', strokeWidth: 1 },
+          labelBgBorderRadius: 8,
+          style: { stroke: clash ? '#ff6f1e' : '#171717', strokeWidth: clash ? 3 : 1.5 },
         }
       }),
     )
   }, [v.cameras, v.edges, v.assignments, v.coloring, n, setNodes, setEdges])
 
   return (
-    <section className="panel flex flex-col p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-semibold">
-          <Network size={16} className="text-violet-300" /> Conflict graph
+    <section className="panel flex flex-col p-6">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="panel-title">
+          <Network size={20} strokeWidth={1.75} /> conflict graph
         </div>
-        <span className="font-mono text-[11px] text-slate-400">V={v.cameras.length} · E={v.edges.length}</span>
+        <span className="tag tabular-nums">V={v.cameras.length} · E={v.edges.length}</span>
       </div>
-      <div className="relative h-[340px] overflow-hidden rounded-xl border border-slate-700/50 bg-slate-950/60">
+      <div className="relative h-[340px] overflow-hidden rounded-lg border-[1.5px] border-ink bg-dew">
         {v.cameras.length === 0 && (
-          <div className="absolute inset-0 z-10 grid place-items-center text-center text-xs text-slate-500">
-            Vertices appear here as Backtracking places cameras
+          <div className="absolute inset-0 z-10 grid place-items-center px-6 text-center text-sm text-pencil">
+            Vertices appear here as backtracking places cameras
           </div>
         )}
         <ReactFlow
@@ -101,11 +102,11 @@ export function ConflictGraph() {
           minZoom={0.4}
           proOptions={{ hideAttribution: true }}
         >
-          <Background variant={BackgroundVariant.Dots} gap={18} color="#1e293b" />
+          <Background variant={BackgroundVariant.Dots} gap={18} color="#bebcbb" />
           <Controls showInteractive={false} />
         </ReactFlow>
       </div>
-      <p className="mt-2 text-[11px] text-slate-500">Drag nodes to rearrange · edge labels show camera distance</p>
+      <p className="hand mt-3 text-lg">drag nodes around — edge labels show camera distance</p>
     </section>
   )
 }

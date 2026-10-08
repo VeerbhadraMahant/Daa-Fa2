@@ -4,34 +4,27 @@ import { Cctv } from 'lucide-react'
 export function Header() {
   return (
     <motion.header
-      initial={{ opacity: 0, y: -20 }}
+      initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="flex items-center gap-4"
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className="flex flex-wrap items-end justify-between gap-x-10 gap-y-5 pt-2"
     >
-      <div className="relative grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-cyan-400/30 bg-slate-900/70">
-        <svg viewBox="0 0 100 100" className="radar absolute inset-0 h-full w-full opacity-70">
-          <defs>
-            <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#22d3ee" stopOpacity="0" />
-              <stop offset="1" stopColor="#22d3ee" stopOpacity="0.55" />
-            </linearGradient>
-          </defs>
-          <path d="M50 50 L50 6 A44 44 0 0 1 94 50 Z" fill="url(#sweep)" />
-        </svg>
-        <Cctv className="relative text-cyan-300" size={26} />
-      </div>
-      <div>
-        <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
-          Intelligent Security Camera Placement
-          <span className="ml-2 bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">
-            & Interference Management
+      <div className="min-w-0 max-w-3xl">
+        <div className="mb-3 flex items-center gap-3">
+          <span className="sticker grid h-11 w-11 -rotate-6 place-items-center shadow-[rgba(0,0,0,0.06)_0_2px_20px_0]">
+            <Cctv size={22} strokeWidth={1.75} aria-hidden="true" />
           </span>
+          <span className="hand rotate-[-2deg] text-2xl sm:text-[26px]">camplan — a daa simulator</span>
+        </div>
+        <h1 className="display text-[28px] sm:text-[36px] lg:text-[46px]">
+          where do the cameras go,{' '}
+          <span className="marker">and who talks on which channel?</span>
         </h1>
-        <p className="text-xs text-slate-400 sm:text-sm">
-          Backtracking finds <em>where</em> cameras go · Graph Coloring decides <em>which channel</em> each one uses
-        </p>
       </div>
+      <p className="max-w-sm text-base leading-normal text-pencil">
+        <b className="font-semibold text-ink">backtracking</b> decides <em className="not-italic underline decoration-marker decoration-2 underline-offset-4">where</em> cameras
+        go. <b className="font-semibold text-ink">graph coloring</b> decides <em className="not-italic underline decoration-marker decoration-2 underline-offset-4">which channel</em> each one uses.
+      </p>
     </motion.header>
   )
 }

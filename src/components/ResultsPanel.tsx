@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { CheckCircle2, Download, XCircle } from 'lucide-react'
-import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useSimulation, useView } from '../store/simulationStore'
 import { channelColor } from './palette'
 
@@ -48,27 +48,29 @@ export function ResultsPanel() {
     <AnimatePresence>
       <motion.section
         key="results"
-        initial={{ opacity: 0, y: 30, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ type: 'spring', stiffness: 120, damping: 16 }}
-        className={`panel relative overflow-hidden p-5 ${success ? '!border-emerald-400/40' : '!border-rose-400/40'}`}
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+        className="panel relative p-8"
       >
-        <motion.div
-          className={`pointer-events-none absolute -inset-x-10 -top-24 h-48 rounded-full blur-3xl ${success ? 'bg-emerald-400/15' : 'bg-rose-400/15'}`}
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 3, repeat: Infinity }}
-        />
-        <div className="relative mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className={`flex items-center gap-2 text-lg font-bold ${success ? 'text-emerald-300' : 'text-rose-300'}`}>
-            {success ? <CheckCircle2 /> : <XCircle />}
-            {success ? 'SECURITY CONFIGURATION COMPLETE' : compiled.placementOk ? 'CHANNEL ASSIGNMENT FAILED' : 'NO VALID CAMERA PLACEMENT'}
+        {success && (
+          <span className="sticker absolute -top-3 right-8 inline-flex items-center gap-1 whitespace-nowrap rotate-[4deg]">
+            <CheckCircle2 size={14} strokeWidth={2} /> all clear
+          </span>
+        )}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="display flex items-center gap-3 text-3xl">
+            {success ? <CheckCircle2 size={28} strokeWidth={1.75} /> : <XCircle size={28} strokeWidth={1.75} className="text-sienna" />}
+            {success
+              ? <span className="marker">security configuration complete</span>
+              : compiled.placementOk ? 'channel assignment failed' : 'no valid camera placement'}
           </h2>
           {compiled.placementOk && (
-            <button className="btn" onClick={exportJson}><Download size={14} /> Export JSON</button>
+            <button className="btn" onClick={exportJson}><Download size={16} /> Export JSON</button>
           )}
         </div>
 
-        <div className="relative grid gap-5 lg:grid-cols-3">
+        <div className="grid gap-8 lg:grid-cols-3">
           <div className="space-y-2">
             {[
               ['Cameras placed', compiled.cameras.length],
@@ -78,60 +80,58 @@ export function ResultsPanel() {
               ['Backtracks', pStats.backtracks + cStats.backtracks],
             ].map(([k, val], i) => (
               <motion.div key={k} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.07 }}
-                className="flex justify-between border-b border-slate-700/40 pb-1 text-sm">
-                <span className="text-slate-400">{k}</span><b className="font-mono">{val}</b>
+                className="flex justify-between border-b border-mist pb-2 text-base">
+                <span className="text-pencil">{k}</span><b className="font-semibold tabular-nums">{val}</b>
               </motion.div>
             ))}
-            <div className="space-y-1 pt-2">
+            <div className="space-y-1.5 pt-3">
               {checks.map(([t, ok], i) => (
                 <motion.div key={t} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 + i * 0.15 }}
-                  className={`flex items-center gap-2 text-xs ${ok ? 'text-emerald-300' : 'text-rose-300'}`}>
-                  {ok ? <CheckCircle2 size={14} /> : <XCircle size={14} />} {t}
+                  className={`flex items-center gap-2 text-sm ${ok ? 'text-ink' : 'font-medium text-sienna'}`}>
+                  {ok ? <CheckCircle2 size={16} strokeWidth={1.75} /> : <XCircle size={16} strokeWidth={1.75} />} {t}
                 </motion.div>
               ))}
             </div>
             {!success && (
-              <p className="pt-2 text-xs text-rose-200/80">{(v.step as { message: string }).message}</p>
+              <p className="inset mt-2 p-3 text-sm text-sienna">{(v.step as { message: string }).message}</p>
             )}
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-slate-700/50">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/80 text-slate-400">
-                <tr><th className="px-3 py-2">Camera</th><th>Row</th><th>Col</th><th>Channel</th></tr>
+          <div className="overflow-hidden rounded-lg border-[1.5px] border-ink">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-dew text-pencil">
+                <tr><th className="px-3 py-2 font-medium">Camera</th><th className="font-medium">Row</th><th className="font-medium">Col</th><th className="font-medium">Channel</th></tr>
               </thead>
-              <tbody>
+              <tbody className="tabular-nums">
                 {compiled.cameras.map((c, i) => (
-                  <motion.tr key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 + i * 0.08 }} className="border-t border-slate-800">
+                  <motion.tr key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 + i * 0.08 }} className="border-t border-mist">
                     <td className="px-3 py-1.5 font-semibold">C{i + 1}</td><td>{c.row + 1}</td><td>{c.col + 1}</td>
                     <td>
                       {assignments[i] ? (
-                        <span className="rounded px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-950" style={{ background: channelColor(assignments[i]) }}>CH{assignments[i]}</span>
+                        <span className="rounded-full border border-ink px-2 py-0.5 text-xs font-semibold text-ink" style={{ background: channelColor(assignments[i]) }}>CH{assignments[i]}</span>
                       ) : '—'}
                     </td>
                   </motion.tr>
                 ))}
-                {compiled.cameras.length === 0 && <tr><td colSpan={4} className="px-3 py-4 text-slate-500">No cameras could be placed.</td></tr>}
+                {compiled.cameras.length === 0 && <tr><td colSpan={4} className="px-3 py-4 text-pencil">No cameras could be placed.</td></tr>}
               </tbody>
             </table>
           </div>
 
-          <div className="h-52">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="85%">
               <BarChart data={chart} margin={{ left: -20, right: 4, top: 8 }}>
-                <CartesianGrid stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} allowDecimals={false} />
-                <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 8, fontSize: 12 }} cursor={{ fill: '#1e293b66' }} />
-                <Bar dataKey="Backtracking" fill="#22d3ee" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Coloring" fill="#f472b6" radius={[4, 4, 0, 0]}>
-                  {chart.map((_, i) => <Cell key={i} fill="#f472b6" />)}
-                </Bar>
+                <CartesianGrid stroke="#bebcbb" strokeDasharray="3 4" vertical={false} />
+                <XAxis dataKey="name" tick={{ fill: '#171717', fontSize: 12 }} stroke="#171717" />
+                <YAxis tick={{ fill: '#171717', fontSize: 12 }} allowDecimals={false} stroke="#171717" />
+                <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #171717', borderRadius: 8, fontSize: 13, boxShadow: 'none' }} cursor={{ fill: '#f7efe9' }} />
+                <Bar dataKey="Backtracking" fill="#fdfbf9" stroke="#171717" strokeWidth={1.5} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Coloring" fill="#ff6f1e" stroke="#171717" strokeWidth={1.5} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <div className="flex justify-center gap-4 text-[11px] text-slate-400">
-              <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-sm bg-cyan-400" /> Backtracking</span>
-              <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-sm bg-pink-400" /> Graph coloring</span>
+            <div className="flex justify-center gap-5 text-sm text-pencil">
+              <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-sm border-[1.5px] border-ink bg-cream" /> Backtracking</span>
+              <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-sm border-[1.5px] border-ink bg-marker" /> Graph coloring</span>
             </div>
           </div>
         </div>

@@ -1,3 +1,5 @@
-export const CHANNEL_COLORS = ['#22d3ee', '#f472b6', '#a3e635', '#fbbf24', '#a78bfa', '#fb923c', '#2dd4bf', '#f87171']
+// Channel identity is data, not decoration: soft marker-pen fills, always drawn
+// with charcoal outlines/text and paired with a "CHn" label (never color alone).
+export const CHANNEL_COLORS = ['#ffb48a', '#f6d86b', '#b9d9a3', '#a8cfe6', '#d9bdee', '#f4a9bd', '#93d6c6', '#e3c9a2']
 export const channelColor = (ch: number | null | undefined) =>
-  ch ? CHANNEL_COLORS[(ch - 1) % CHANNEL_COLORS.length] : '#64748b'
+  ch ? CHANNEL_COLORS[(ch - 1) % CHANNEL_COLORS.length] : '#f7efe9'
