@@ -1,67 +1,174 @@
 @import 'tailwindcss';
 @import '@xyflow/react/dist/style.css';
 
+/*
+ * Design tokens — "schoolyard notebook": warm cream paper, charcoal ink,
+ * one marker-orange accent, thin 1.5px outlines instead of fills,
+ * soft serif display type, whisper-light shadows.
+ */
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'Fraunces', 'Recoleta', Georgia, serif;
+  --font-hand: 'Caveat', 'Segoe Script', cursive;
+  --font-mono: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-cream: #fdfbf9;
+  --color-dew: #f7efe9;
+  --color-ink: #171717;
+  --color-cocoa: #2b1a07;
+  --color-marker: #ff6f1e;
+  --color-sienna: #ce500a;
+  --color-mist: #bebcbb;
+  --color-pencil: #5c564f; /* secondary text, 6.9:1 on cream */
+
+  --radius-card: 12px;
+  --radius-pill: 20px;
+  --shadow-card: rgba(0, 0, 0, 0.06) 0 2px 20px 0;
+  --shadow-btn: rgba(0, 0, 0, 0.25) 0 1px 2px 0;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+  --canvas: #fdfbf9;
+  --tint: #f7efe9;
+  --ink: #171717;
+  --cocoa: #2b1a07;
+  --marker: #ff6f1e;
+  --sienna: #ce500a;
+  --pencil: #5c564f;
+  --line: 1.5px solid #171717;
 }
+
+html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  background: #060a14;
-  color: #e2e8f0;
-  background-image:
-    radial-gradient(900px 500px at 15% -10%, rgba(34, 211, 238, 0.14), transparent 60%),
-    radial-gradient(800px 500px at 100% 0%, rgba(167, 139, 250, 0.14), transparent 60%),
-    linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
-  background-size: auto, auto, 36px 36px, 36px 36px;
-  background-attachment: fixed;
+  min-height: 100dvh;
+  background-color: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
+.font-mono, .tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* ── Type ─────────────────────────────────── */
+.display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--cocoa);
+  line-height: 1.12;
+  letter-spacing: normal;
+  text-transform: lowercase;
+}
+.hand {
+  font-family: var(--font-hand);
+  color: var(--sienna);
+  line-height: 1.1;
+}
+/* marker highlight: orange text with a rough underline */
+.marker {
+  color: var(--sienna);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C 15 2, 30 7, 50 4 S 85 3, 99 5' fill='none' stroke='%23ff6f1e' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.28em;
+  padding-bottom: 0.12em;
+}
+
+/* ── Surfaces ─────────────────────────────── */
 .panel {
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  background: rgba(15, 23, 42, 0.62);
-  backdrop-filter: blur(14px);
-  border-radius: 1rem;
-  box-shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.6);
+  border: var(--line);
+  background: var(--canvas);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--cocoa);
+  text-transform: lowercase;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 20px;
+  padding: 0.1rem 0.65rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background: var(--canvas);
+  font-variant-numeric: tabular-nums;
+}
+.sticker {
+  background: #fff;
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+}
+.inset {
+  background: var(--tint);
+  border-radius: 8px;
 }
 
+/* ── Buttons: outlined pills, no fills ────── */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  border-radius: 0.65rem;
-  padding: 0.5rem 0.8rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: rgba(30, 41, 59, 0.7);
-  color: #e2e8f0;
-  transition: all 0.15s;
+  gap: 0.45rem;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: 20px;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: var(--line);
+  background: var(--canvas);
+  color: var(--ink);
+  box-shadow: var(--shadow-btn);
   cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.16s var(--ease-out-soft), box-shadow 0.16s var(--ease-out-soft);
 }
-.btn:hover:not(:disabled) { background: rgba(51, 65, 85, 0.9); transform: translateY(-1px); }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-primary {
-  background: linear-gradient(135deg, #06b6d4, #6366f1);
-  border-color: transparent;
-  box-shadow: 0 6px 24px -6px rgba(99, 102, 241, 0.7);
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+/* the one primary action per screen: same outline, marker underline + heavier weight */
+.btn-primary { font-weight: 600; border-color: var(--ink); outline: 2px solid var(--marker); outline-offset: 2px; }
+.btn-primary:focus-visible { outline-color: var(--ink); }
+.btn-icon { padding: 0; width: 44px; }
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 8px;
 }
-.btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #22d3ee, #818cf8); }
 
-.radar { animation: sweep 3s linear infinite; transform-origin: 50% 50%; }
-@keyframes sweep { to { transform: rotate(360deg); } }
-
+/* ── Third-party tweaks ───────────────────── */
 .react-flow__attribution { display: none; }
-.react-flow__controls button { background: #0f172a; border-color: #1e293b; fill: #94a3b8; }
+.react-flow__controls { box-shadow: none; border: var(--line); border-radius: 8px; overflow: hidden; }
+.react-flow__controls button { background: var(--canvas); border-bottom: 1px solid var(--ink); fill: var(--ink); }
+.react-flow__controls button:hover { background: var(--tint); }
+.react-flow__edge-textbg { fill: var(--canvas); }
 
-input[type='range'] { accent-color: #22d3ee; }
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
+input[type='range'] { accent-color: var(--marker); min-height: 28px; cursor: pointer; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--mist, #bebcbb); border-radius: 99px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
