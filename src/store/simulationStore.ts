@@ -25,7 +25,7 @@ export function compile(cfg: Config): Compiled {
   steps.push(...graphSteps(p.solution, edges))
   const c = colorGraph(p.solution.length, edges, cfg.channels)
   steps.push(...c.steps)
-  return { steps, cameras: p.solution, edges, placementOk: true, coloringOk: !!c.assignments, truncated: false }
+  return { steps, cameras: p.solution, edges, placementOk: true, coloringOk: !!c.assignments, truncated: c.truncated }
 }
 
 interface SimState {
@@ -73,6 +73,8 @@ export const useSimulation = create<SimState>((set, get) => {
       next.cols = clamp(next.cols, 3, 12)
       next.cameras = clamp(next.cameras, 1, 12)
       next.channels = clamp(next.channels, 1, 8)
+      next.interferenceRange = clamp(next.interferenceRange, 1, 8)
+      next.minSeparation = clamp(next.minSeparation, 1, 4)
       next.blocked = next.blocked.filter((b) => b.row < next.rows && b.col < next.cols)
       set({ config: next, ...invalidate })
     },

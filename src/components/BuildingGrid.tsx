@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Building2 } from 'lucide-react'
 import { useSimulation, useView } from '../store/simulationStore'
@@ -18,7 +19,8 @@ export function BuildingGrid() {
   const { rows, cols } = config
   const editable = !v.started
 
-  const cellAt = (r: number, c: number) => v.cameras.findIndex((p) => p.row === r && p.col === c)
+  const blockedSet = useMemo(() => new Set(config.blocked.map((b) => b.row * cols + b.col)), [config.blocked, cols])
+  const cameraAt = useMemo(() => new Map(v.cameras.map((p, i) => [p.row * cols + p.col, i])), [v.cameras, cols])
   const pl = v.placement
   const activeVertex = v.coloring?.vertex ?? -1
 
@@ -37,8 +39,8 @@ export function BuildingGrid() {
           {Array.from({ length: rows * cols }, (_, i) => {
             const r = Math.floor(i / cols)
             const c = i % cols
-            const blocked = config.blocked.some((b) => b.row === r && b.col === c)
-            const cam = cellAt(r, c)
+            const blocked = blockedSet.has(i)
+            const cam = cameraAt.get(i) ?? -1
             let mark: CellMark = 'none'
             if (pl?.cell && pl.cell.row === r && pl.cell.col === c) {
               mark = pl.action === 'try' ? 'try' : pl.action === 'reject' ? 'reject' : pl.action === 'backtrack' ? 'backtrack' : 'none'

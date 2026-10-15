@@ -53,4 +53,21 @@ describe('graph + coloring', () => {
     expect(r.assignments).toBeNull()
     expect(r.steps.at(-1)!.action).toBe('fail')
   })
+  it('breaks channel symmetry: K6 with 5 channels fails fast, never trying channel > used+1', () => {
+    const edges = []
+    for (let a = 0; a < 6; a++) for (let b = a + 1; b < 6; b++) edges.push({ a, b, distance: 1 })
+    const r = colorGraph(6, edges, 5)
+    expect(r.assignments).toBeNull()
+    expect(r.truncated).toBe(false)
+    expect(r.steps.length).toBeLessThan(100)
+  })
+})
+
+describe('placement snapshots', () => {
+  it('shares snapshots between steps without aliasing later placements', () => {
+    const r = solvePlacement({ ...defaultConfig(), rows: 6, cols: 6, cameras: 6 })
+    r.steps.forEach((s) => {
+      if (s.phase === 'placement' && s.action === 'place') expect(s.cameras.at(-1)).toEqual(s.cell)
+    })
+  })
 })

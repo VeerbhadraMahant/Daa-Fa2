@@ -25,7 +25,7 @@ npm run build    # type-check + production build (static Vite app, deployable to
 
 **Interference rule:** two cameras get an edge iff their Euclidean distance ≤ *interference range* (cells).
 
-**Coloring:** exact backtracking with *m* channels; vertices ordered by descending degree, channels tried 1..m. If no proper coloring exists the app says so (add channels or reduce the range).
+**Coloring:** exact backtracking with *m* channels; vertices ordered by descending degree, channels tried 1..m but never above (highest channel used so far + 1) — channels are interchangeable, so this symmetry breaking is lossless and makes impossible instances fail quickly. If no proper coloring exists the app says so (add channels or reduce the range).
 
 Both searches log every decision (`try / reject / place / backtrack / assign / conflict`) into a step list; the UI just replays it. Searches are capped at 60 000 steps so impossible scenarios cannot freeze the browser.
 
