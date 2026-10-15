@@ -3,6 +3,7 @@ import { solvePlacement, checkPlacement } from './backtracking'
 import { buildConflictGraph } from './conflictGraph'
 import { colorGraph } from './graphColoring'
 import { defaultConfig } from '../data/defaultScenario'
+import { compile } from '../store/simulationStore'
 
 describe('backtracking', () => {
   it('solves the demo scenario with valid placements', () => {
@@ -52,5 +53,30 @@ describe('graph + coloring', () => {
     const r = colorGraph(3, edges, 2)
     expect(r.assignments).toBeNull()
     expect(r.steps.at(-1)!.action).toBe('fail')
+  })
+  it('breaks channel symmetry: K6 with 5 channels fails fast, never trying channel > used+1', () => {
+    const edges = []
+    for (let a = 0; a < 6; a++) for (let b = a + 1; b < 6; b++) edges.push({ a, b, distance: 1 })
+    const r = colorGraph(6, edges, 5)
+    expect(r.assignments).toBeNull()
+    expect(r.truncated).toBe(false)
+    expect(r.steps.length).toBeLessThan(100)
+  })
+})
+
+describe('placement snapshots', () => {
+  it('shares snapshots between steps without aliasing later placements', () => {
+    const r = solvePlacement({ ...defaultConfig(), rows: 6, cols: 6, cameras: 6 })
+    r.steps.forEach((s) => {
+      if (s.phase === 'placement' && s.action === 'place') expect(s.cameras.at(-1)).toEqual(s.cell)
+    })
+  })
+})
+
+describe('compile', () => {
+  it('precomputes final placement stats matching the last placement step', () => {
+    const c = compile(defaultConfig())
+    const last = c.steps.filter((s) => s.phase === 'placement').at(-1)!
+    expect(last.phase === 'placement' && last.stats).toEqual(c.placementStats)
   })
 })

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { useMemo } from 'react'
-import type { Cell, Config, Edge, Phase, PlacementStep, ColoringStep, Step } from '../types/simulation'
+import type { Cell, Config, Edge, Phase, PlacementStep, ColoringStep, Step, Stats } from '../types/simulation'
 import { solvePlacement } from '../algorithms/backtracking'
 import { buildConflictGraph, graphSteps } from '../algorithms/conflictGraph'
 import { colorGraph } from '../algorithms/graphColoring'
@@ -10,6 +10,8 @@ interface Compiled {
   steps: Step[]
   cameras: Cell[]
   edges: Edge[]
+  /** final placement counters, precomputed so panels never scan the step list */
+  placementStats: Stats
   placementOk: boolean
   coloringOk: boolean
   truncated: boolean
@@ -18,14 +20,15 @@ interface Compiled {
 export function compile(cfg: Config): Compiled {
   const p = solvePlacement(cfg)
   const steps: Step[] = [...p.steps]
+  const placementStats = p.steps[p.steps.length - 1].stats
   if (!p.solution) {
-    return { steps, cameras: [], edges: [], placementOk: false, coloringOk: false, truncated: p.truncated }
+    return { steps, cameras: [], edges: [], placementStats, placementOk: false, coloringOk: false, truncated: p.truncated }
   }
   const edges = buildConflictGraph(p.solution, cfg.interferenceRange)
   steps.push(...graphSteps(p.solution, edges))
   const c = colorGraph(p.solution.length, edges, cfg.channels)
   steps.push(...c.steps)
-  return { steps, cameras: p.solution, edges, placementOk: true, coloringOk: !!c.assignments, truncated: false }
+  return { steps, cameras: p.solution, edges, placementStats, placementOk: true, coloringOk: !!c.assignments, truncated: c.truncated }
 }
 
 interface SimState {
@@ -73,6 +76,8 @@ export const useSimulation = create<SimState>((set, get) => {
       next.cols = clamp(next.cols, 3, 12)
       next.cameras = clamp(next.cameras, 1, 12)
       next.channels = clamp(next.channels, 1, 8)
+      next.interferenceRange = clamp(next.interferenceRange, 1, 8)
+      next.minSeparation = clamp(next.minSeparation, 1, 4)
       next.blocked = next.blocked.filter((b) => b.row < next.rows && b.col < next.cols)
       set({ config: next, ...invalidate })
     },

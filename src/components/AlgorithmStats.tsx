@@ -20,13 +20,12 @@ const STATUS: Record<string, string> = {
 const BAD = new Set(['reject', 'conflict', 'fail', 'backtrack'])
 
 export function AlgorithmStats() {
-  const { compiled } = useSimulation()
+  const placementStats = useSimulation((s) => s.compiled?.placementStats)
   const v = useView()
   const isColoring = v.phase === 'coloring' || (v.phase === 'done' && !!v.coloring)
   const stats = isColoring ? v.coloring!.stats : (v.placement?.stats ?? { tried: 0, conflicts: 0, backtracks: 0 })
   // when past placement show final placement stats
-  const placementFinal = compiled?.steps.filter((s) => s.phase === 'placement').at(-1)
-  const shown = v.phase === 'graph' && placementFinal?.phase === 'placement' ? placementFinal.stats : stats
+  const shown = v.phase === 'graph' && placementStats ? placementStats : stats
   const algo = v.phase === 'idle' ? '—' : isColoring || v.phase === 'done' ? 'graph coloring' : v.phase === 'graph' ? 'graph build' : 'backtracking'
   const action = v.step && 'action' in v.step ? v.step.action : ''
   const current =

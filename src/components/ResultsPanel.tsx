@@ -5,12 +5,12 @@ import { useSimulation, useView } from '../store/simulationStore'
 import { channelColor } from './palette'
 
 export function ResultsPanel() {
-  const { compiled, config } = useSimulation()
+  const compiled = useSimulation((s) => s.compiled)
+  const config = useSimulation((s) => s.config)
   const v = useView()
   if (!compiled || !v.finished) return null
 
-  const pSteps = compiled.steps.filter((s) => s.phase === 'placement')
-  const pStats = pSteps.length ? (pSteps[pSteps.length - 1] as { stats: { tried: number; conflicts: number; backtracks: number } }).stats : { tried: 0, conflicts: 0, backtracks: 0 }
+  const pStats = compiled.placementStats
   const cStats = v.coloring?.stats ?? { tried: 0, conflicts: 0, backtracks: 0 }
   const assignments = v.assignments
   const success = compiled.placementOk && compiled.coloringOk

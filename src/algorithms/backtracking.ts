@@ -17,8 +17,10 @@ export interface Violation {
  *  5. Chebyshev distance between any two cameras >= cfg.minSeparation
  * Duplicate cells are impossible because candidates are strictly increasing in row-major order.
  */
-export function checkPlacement(cfg: Config, placed: Cell[], c: Cell): Violation | null {
-  if (cfg.blocked.some((b) => b.row === c.row && b.col === c.col)) return { reason: 'blocked' }
+export const blockedKeys = (cfg: Config): Set<number> => new Set(cfg.blocked.map((b) => b.row * cfg.cols + b.col))
+
+export function checkPlacement(cfg: Config, placed: Cell[], c: Cell, blocked: Set<number> = blockedKeys(cfg)): Violation | null {
+  if (blocked.has(c.row * cfg.cols + c.col)) return { reason: 'blocked' }
   for (const p of placed) {
     if (cfg.uniqueRows && p.row === c.row) return { reason: 'row', against: p }
     if (cfg.uniqueCols && p.col === c.col) return { reason: 'col', against: p }
@@ -53,12 +55,15 @@ export function solvePlacement(cfg: Config): PlacementResult {
   const placed: Cell[] = []
   const stats: Stats = { tried: 0, conflicts: 0, backtracks: 0 }
   let truncated = false
+  const blocked = blockedKeys(cfg)
+  // steps share one immutable snapshot until a camera is placed/removed (saves O(steps*K) memory)
+  let snapshot: Cell[] = []
 
   const push = (s: Omit<PlacementStep, 'phase' | 'cameras' | 'stats' | 'cameraIndex'>) => {
     steps.push({
       phase: 'placement',
       cameraIndex: placed.length,
-      cameras: placed.map((p) => ({ ...p })),
+      cameras: snapshot,
       stats: { ...stats },
       ...s,
     })
@@ -79,7 +84,7 @@ export function solvePlacement(cfg: Config): PlacementResult {
       const k = placed.length + 1
       stats.tried++
       push({ action: 'try', cell, message: `C${k}: trying (${cell.row + 1},${cell.col + 1})` })
-      const v = checkPlacement(cfg, placed, cell)
+      const v = checkPlacement(cfg, placed, cell, blocked)
       if (v) {
         stats.conflicts++
         push({
@@ -92,10 +97,12 @@ export function solvePlacement(cfg: Config): PlacementResult {
         continue
       }
       placed.push(cell)
+      snapshot = placed.map((p) => ({ ...p }))
       push({ action: 'place', cell, message: `C${k} placed at (${cell.row + 1},${cell.col + 1})` })
       if (recurse(idx + 1)) return true
       if (truncated) return false
       placed.pop()
+      snapshot = placed.map((p) => ({ ...p }))
       stats.backtracks++
       push({
         action: 'backtrack',

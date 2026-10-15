@@ -7,12 +7,15 @@ export interface ColoringResult {
   steps: ColoringStep[]
   assignments: number[] | null
   chromaticUsed: number
+  truncated: boolean
 }
 
 /**
  * Exact graph coloring by backtracking with m colors (channels).
  * Vertices are visited in descending-degree order (a standard heuristic that
- * fails early); channels are tried 1..m in order.
+ * fails early); channels are tried 1..m in order, but never above (highest channel
+ * used so far + 1): channels are interchangeable, so skipping the rest removes
+ * m!-fold symmetric duplicates and lets impossible instances fail fast.
  */
 export function colorGraph(n: number, edges: Edge[], channels: number): ColoringResult {
   const adj = adjacencyList(n, edges)
@@ -25,10 +28,10 @@ export function colorGraph(n: number, edges: Edge[], channels: number): Coloring
   const push = (s: Omit<ColoringStep, 'phase' | 'assignments' | 'stats'>) =>
     steps.push({ phase: 'coloring', assignments: [...color], stats: { ...stats }, ...s })
 
-  function recurse(i: number): boolean {
+  function recurse(i: number, used: number): boolean {
     if (i === n) return true
     const v = order[i]
-    for (let ch = 1; ch <= channels; ch++) {
+    for (let ch = 1; ch <= Math.min(channels, used + 1); ch++) {
       if (steps.length >= MAX_COLORING_STEPS) {
         truncated = true
         return false
@@ -49,7 +52,7 @@ export function colorGraph(n: number, edges: Edge[], channels: number): Coloring
       }
       color[v] = ch
       push({ action: 'assign', vertex: v, channel: ch, message: `C${v + 1} → Channel ${ch}` })
-      if (recurse(i + 1)) return true
+      if (recurse(i + 1, Math.max(used, ch))) return true
       if (truncated) return false
       color[v] = null
       stats.backtracks++
@@ -63,7 +66,7 @@ export function colorGraph(n: number, edges: Edge[], channels: number): Coloring
     return false
   }
 
-  const ok = recurse(0)
+  const ok = recurse(0, 0)
   if (ok) push({ action: 'solved', message: 'Every camera has a conflict-free channel' })
   else
     push({
@@ -73,5 +76,5 @@ export function colorGraph(n: number, edges: Edge[], channels: number): Coloring
         : `Not colorable with ${channels} channel${channels === 1 ? '' : 's'} — add channels or reduce interference`,
     })
   const assignments = ok ? (color as number[]) : null
-  return { steps, assignments, chromaticUsed: assignments ? new Set(assignments).size : 0 }
+  return { steps, assignments, chromaticUsed: assignments ? new Set(assignments).size : 0, truncated }
 }
