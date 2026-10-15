@@ -38,7 +38,7 @@ export const presets: Preset[] = [
   },
   {
     name: 'No placement exists',
-    blurb: '4×4 · 5 cameras · rows+cols unique',
-    config: { ...defaultConfig(), rows: 4, cols: 4, cameras: 5, blocked: [] },
+    blurb: '3×3 · 3 cameras · N-Queens rules (no solution)',
+    config: { ...defaultConfig(), rows: 3, cols: 3, cameras: 3, minSeparation: 1, blocked: [] },
   },
 ]

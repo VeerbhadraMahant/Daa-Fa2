@@ -6,6 +6,7 @@ import { useSimulation, useView } from '../store/simulationStore'
 const MARK: Record<string, string> = {
   reject: '✕', conflict: '✕', fail: '✕',
   backtrack: '↩',
+  skip: '»',
   place: '✓', assign: '✓', solved: '✓', complete: '✓',
 }
 const STRONG = new Set(['reject', 'conflict', 'fail', 'backtrack'])

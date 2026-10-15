@@ -30,7 +30,7 @@ export type RejectReason = 'blocked' | 'row' | 'col' | 'diagonal' | 'separation'
 
 export interface PlacementStep {
   phase: 'placement'
-  action: 'try' | 'reject' | 'place' | 'backtrack' | 'solved' | 'fail'
+  action: 'try' | 'reject' | 'place' | 'backtrack' | 'skip' | 'solved' | 'fail'
   cell?: Cell
   reason?: RejectReason
   /** Camera that conflicts with the candidate, when applicable. */
@@ -64,7 +64,7 @@ export interface ColoringStats {
 
 export interface ColoringStep {
   phase: 'coloring'
-  action: 'try' | 'conflict' | 'assign' | 'backtrack' | 'solved' | 'fail'
+  action: 'try' | 'conflict' | 'assign' | 'backtrack' | 'skip' | 'solved' | 'fail'
   vertex?: number
   channel?: number
   against?: number

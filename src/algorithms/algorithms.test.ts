@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { solvePlacement, checkPlacement } from './backtracking'
+import { solvePlacement, checkPlacement, MAX_PLACEMENT_STEPS } from './backtracking'
 import { buildConflictGraph } from './conflictGraph'
 import { colorGraph } from './graphColoring'
 import { defaultConfig } from '../data/defaultScenario'
@@ -15,7 +15,7 @@ describe('backtracking', () => {
     s.forEach((c, i) => expect(checkPlacement(cfg, s.slice(0, i), c)).toBeNull())
     expect(r.steps.at(-1)!.action).toBe('solved')
   })
-  it('reports no solution when impossible', () => {
+  it('reports no solution when impossible (3x3, 4 cameras)', () => {
     const r = solvePlacement({ ...defaultConfig(), rows: 3, cols: 3, cameras: 4 })
     expect(r.solution).toBeNull()
     expect(r.steps.at(-1)!.action).toBe('fail')
@@ -78,5 +78,46 @@ describe('compile', () => {
     const c = compile(defaultConfig())
     const last = c.steps.filter((s) => s.phase === 'placement').at(-1)!
     expect(last.phase === 'placement' && last.stats).toEqual(c.placementStats)
+  })
+})
+
+describe('placement pruning is exact', () => {
+  // exhaustive reference: does ANY valid set of K cells exist?
+  const brute = (cfg: ReturnType<typeof defaultConfig>): boolean => {
+    const cells = Array.from({ length: cfg.rows * cfg.cols }, (_, i) => ({ row: Math.floor(i / cfg.cols), col: i % cfg.cols }))
+    const go = (start: number, placed: typeof cells): boolean => {
+      if (placed.length === cfg.cameras) return true
+      for (let i = start; i < cells.length; i++)
+        if (!checkPlacement(cfg, placed, cells[i]) && go(i + 1, [...placed, cells[i]])) return true
+      return false
+    }
+    return go(0, [])
+  }
+  it('agrees with brute force on many small configurations', () => {
+    for (let rows = 3; rows <= 5; rows++)
+      for (let cols = 3; cols <= 5; cols++)
+        for (let cameras = 1; cameras <= 5; cameras++)
+          for (const [uniqueRows, uniqueCols, uniqueDiagonals] of [[true, true, true], [true, false, false], [true, true, false], [false, true, true]])
+            for (const minSeparation of [1, 2]) {
+              const cfg = { ...defaultConfig(), rows, cols, cameras, uniqueRows, uniqueCols, uniqueDiagonals, minSeparation, blocked: [{ row: 1, col: 1 }] }
+              const r = solvePlacement(cfg)
+              expect(!!r.solution, JSON.stringify(cfg)).toBe(brute(cfg))
+              if (r.solution) r.solution.forEach((c, i) => expect(checkPlacement(cfg, r.solution!.slice(0, i), c)).toBeNull())
+            }
+  })
+  it('fails instantly when cameras exceed rows (pigeonhole)', () => {
+    const r = solvePlacement({ ...defaultConfig(), rows: 8, cols: 8, cameras: 9 })
+    expect(r.solution).toBeNull()
+    expect(r.steps).toHaveLength(1)
+    expect(r.truncated).toBe(false)
+  })
+  it('still solves when the replay log fills up (fast-forward)', () => {
+    const r = solvePlacement({ ...defaultConfig(), rows: 20, cols: 20, cameras: 20 })
+    expect(r.solution).toHaveLength(20)
+    expect(r.truncated).toBe(false)
+    expect(r.skipped).toBeGreaterThan(0)
+    expect(r.steps.length).toBeLessThanOrEqual(MAX_PLACEMENT_STEPS + 3)
+    expect(r.steps.some((s) => s.action === 'skip')).toBe(true)
+    expect(r.steps.at(-1)!.cameras).toHaveLength(20)
   })
 })

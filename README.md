@@ -27,7 +27,9 @@ npm run build    # type-check + production build (static Vite app, deployable to
 
 **Coloring:** exact backtracking with *m* channels; vertices ordered by descending degree, channels tried 1..m but never above (highest channel used so far + 1) — channels are interchangeable, so this symmetry breaking is lossless and makes impossible instances fail quickly. If no proper coloring exists the app says so (add channels or reduce the range).
 
-Both searches log every decision (`try / reject / place / backtrack / assign / conflict`) into a step list; the UI just replays it. Searches are capped at 60 000 steps so impossible scenarios cannot freeze the browser.
+Both searches log every decision (`try / reject / place / backtrack / assign / conflict`) into a step list; the UI just replays it. Only the first 60 000 decisions are kept for replay; after that the search keeps running unrecorded (a *fast-forward* step marks the jump), so the answer stays exact. A hard budget of 5 000 000 candidate positions stops hopeless scenarios from freezing the browser.
+
+**Placement pruning:** not enough cells left; with *one per row*, not enough rows left; an up-front pigeonhole check (more cameras than rows/columns fails instantly); and forward checking (if every remaining row is needed, each must still have a legal cell). Grids and camera counts go up to 20.
 
 ## Architecture
 

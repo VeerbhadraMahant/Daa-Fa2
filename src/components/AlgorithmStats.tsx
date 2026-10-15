@@ -14,7 +14,7 @@ function Stat({ icon, label, value }: { icon: ReactNode; label: string; value: n
 }
 
 const STATUS: Record<string, string> = {
-  try: 'checking', reject: 'conflict', place: 'placed', backtrack: 'backtracking', solved: 'solved', fail: 'no solution',
+  try: 'checking', reject: 'conflict', place: 'placed', backtrack: 'backtracking', skip: 'fast-forward', solved: 'solved', fail: 'no solution',
   edge: 'linking', complete: 'graph ready', conflict: 'clash', assign: 'assigned',
 }
 const BAD = new Set(['reject', 'conflict', 'fail', 'backtrack'])

@@ -40,7 +40,8 @@ export function ConflictGraph() {
   const n = Math.max(cameras, 1)
 
   useEffect(() => {
-    const R = 115
+    // widen the ring as cameras grow so the 48px nodes do not overlap
+    const R = Math.max(115, (n * 54) / (2 * Math.PI))
     setNodes((prev) =>
       v.cameras.map((_, i) => {
         const old = prev.find((p) => p.id === `c${i}`)
@@ -98,8 +99,8 @@ export function ConflictGraph() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
-          defaultViewport={{ x: 0, y: 10, zoom: 0.95 }}
-          minZoom={0.4}
+          defaultViewport={n > 12 ? { x: 40, y: 10, zoom: 0.6 } : { x: 0, y: 10, zoom: 0.95 }}
+          minZoom={0.3}
           proOptions={{ hideAttribution: true }}
         >
           <Background variant={BackgroundVariant.Dots} gap={18} color="#bebcbb" />

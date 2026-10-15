@@ -32,7 +32,7 @@ export function CameraCell({ blocked, camera, channel, mark, active, ringCells, 
       whileHover={editable ? { scale: 1.06 } : undefined}
       animate={mark === 'reject' ? { x: [0, -3, 3, -2, 2, 0] } : { x: 0 }}
       transition={{ duration: 0.3 }}
-      className={`relative aspect-square min-h-8 rounded-lg border-[1.5px] transition-colors duration-150 ${
+      className={`relative aspect-square min-h-6 rounded-lg border-[1.5px] transition-colors duration-150 ${
         blocked ? 'border-ink bg-dew [background-image:repeating-linear-gradient(45deg,transparent_0_5px,rgba(23,23,23,0.14)_5px_6px)]' : MARK_STYLE[mark]
       } ${editable ? 'cursor-pointer' : 'cursor-default'}`}
       aria-label={blocked ? 'blocked cell' : camera !== null ? `camera ${camera + 1}` : 'empty cell'}

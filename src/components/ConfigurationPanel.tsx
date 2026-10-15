@@ -45,9 +45,9 @@ export function ConfigurationPanel() {
         <Settings2 size={20} strokeWidth={1.75} /> configuration
       </div>
       <div className="space-y-3">
-        <Stepper label="Rows" value={config.rows} min={3} max={12} onChange={(v) => setConfig({ rows: v })} />
-        <Stepper label="Columns" value={config.cols} min={3} max={12} onChange={(v) => setConfig({ cols: v })} />
-        <Stepper label="Cameras" value={config.cameras} min={1} max={12} onChange={(v) => setConfig({ cameras: v })} />
+        <Stepper label="Rows" value={config.rows} min={3} max={20} onChange={(v) => setConfig({ rows: v })} />
+        <Stepper label="Columns" value={config.cols} min={3} max={20} onChange={(v) => setConfig({ cols: v })} />
+        <Stepper label="Cameras" value={config.cameras} min={1} max={20} onChange={(v) => setConfig({ cameras: v })} />
         <Stepper label="Channels" value={config.channels} min={1} max={8} onChange={(v) => setConfig({ channels: v })} />
         <Stepper label="Interference range" value={config.interferenceRange} min={1} max={8} step={0.5} suffix=" cells" onChange={(v) => setConfig({ interferenceRange: v })} />
         <Stepper label="Min. separation" value={config.minSeparation} min={1} max={4} suffix=" cells" onChange={(v) => setConfig({ minSeparation: v })} />

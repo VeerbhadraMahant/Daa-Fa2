@@ -72,9 +72,9 @@ export const useSimulation = create<SimState>((set, get) => {
     speed: 6,
     setConfig: (patch) => {
       const next = { ...get().config, ...patch }
-      next.rows = clamp(next.rows, 3, 12)
-      next.cols = clamp(next.cols, 3, 12)
-      next.cameras = clamp(next.cameras, 1, 12)
+      next.rows = clamp(next.rows, 3, 20)
+      next.cols = clamp(next.cols, 3, 20)
+      next.cameras = clamp(next.cameras, 1, 20)
       next.channels = clamp(next.channels, 1, 8)
       next.interferenceRange = clamp(next.interferenceRange, 1, 8)
       next.minSeparation = clamp(next.minSeparation, 1, 4)
