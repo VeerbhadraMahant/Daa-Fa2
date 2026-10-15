@@ -33,11 +33,11 @@ function CameraNode({ data }: NodeProps<Node<CamData>>) {
 const nodeTypes = { camera: CameraNode }
 
 export function ConflictGraph() {
-  const { config } = useSimulation()
+  const cameras = useSimulation((s) => s.config.cameras)
   const v = useView()
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<CamData>>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
-  const n = Math.max(config.cameras, 1)
+  const n = Math.max(cameras, 1)
 
   useEffect(() => {
     const R = 115

@@ -3,6 +3,7 @@ import { solvePlacement, checkPlacement } from './backtracking'
 import { buildConflictGraph } from './conflictGraph'
 import { colorGraph } from './graphColoring'
 import { defaultConfig } from '../data/defaultScenario'
+import { compile } from '../store/simulationStore'
 
 describe('backtracking', () => {
   it('solves the demo scenario with valid placements', () => {
@@ -69,5 +70,13 @@ describe('placement snapshots', () => {
     r.steps.forEach((s) => {
       if (s.phase === 'placement' && s.action === 'place') expect(s.cameras.at(-1)).toEqual(s.cell)
     })
+  })
+})
+
+describe('compile', () => {
+  it('precomputes final placement stats matching the last placement step', () => {
+    const c = compile(defaultConfig())
+    const last = c.steps.filter((s) => s.phase === 'placement').at(-1)!
+    expect(last.phase === 'placement' && last.stats).toEqual(c.placementStats)
   })
 })

@@ -4,7 +4,7 @@ import { useSimulation, useView } from '../store/simulationStore'
 import { channelColor } from './palette'
 
 export function ColoringPanel() {
-  const { config } = useSimulation()
+  const config = useSimulation((s) => s.config)
   const v = useView()
   const active = v.coloring?.vertex
   return (

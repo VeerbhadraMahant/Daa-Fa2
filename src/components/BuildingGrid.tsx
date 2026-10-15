@@ -14,7 +14,8 @@ const LEGEND = [
 ]
 
 export function BuildingGrid() {
-  const { config, toggleBlocked } = useSimulation()
+  const config = useSimulation((s) => s.config)
+  const toggleBlocked = useSimulation((s) => s.toggleBlocked)
   const v = useView()
   const { rows, cols } = config
   const editable = !v.started

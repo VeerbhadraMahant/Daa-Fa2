@@ -11,7 +11,8 @@ const MARK: Record<string, string> = {
 const STRONG = new Set(['reject', 'conflict', 'fail', 'backtrack'])
 
 export function StepLog() {
-  const { compiled, index } = useSimulation()
+  const compiled = useSimulation((s) => s.compiled)
+  const index = useSimulation((s) => s.index)
   const v = useView()
   const recent = compiled ? compiled.steps.slice(Math.max(0, index - 6), index + 1).map((s, i, a) => ({ s, key: index - (a.length - 1 - i) })) : []
   return (
